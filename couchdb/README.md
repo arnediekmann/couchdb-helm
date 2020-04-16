@@ -59,14 +59,14 @@ Secret containing `adminUsername`, `adminPassword` and `cookieAuthSecret` keys:
 $  kubectl create secret generic my-release-couchdb --from-literal=adminUsername=foo --from-literal=adminPassword=bar --from-literal=cookieAuthSecret=baz
 ```
 
-If you want to set the `adminHash` directly to achieve consistent salts between 
+If you want to set the `adminHash` directly to achieve consistent salts between
 different nodes you need to addionally add the key `password.ini` to the secret:
 
 ```bash
 $  kubectl create secret generic my-release-couchdb \
    --from-literal=adminUsername=foo \
    --from-literal=cookieAuthSecret=baz \
-   --from-file=./my-password.ini 
+   --from-file=./my-password.ini
 ```
 
 With the following contents in `my-password.ini`:
@@ -136,80 +136,81 @@ $ helm upgrade my-release couchdb/couchdb
 The following table lists the most commonly configured parameters of the
 CouchDB chart and their default values:
 
-|           Parameter             |             Description                               |                Default                 |
-|---------------------------------|-------------------------------------------------------|----------------------------------------|
-| `clusterSize`                   | The initial number of nodes in the CouchDB cluster    | 3                                      |
-| `couchdbConfig`                 | Map allowing override elements of server .ini config  | *See below*                            |
-| `allowAdminParty`               | If enabled, start cluster without admin account       | false (requires creating a Secret)     |
-| `createAdminSecret`             | If enabled, create an admin account and cookie secret | true                                   |
-| `schedulerName`                 | Name of the k8s scheduler (other than default)        | `nil`                                  |
-| `erlangFlags`                   | Map of flags supplied to the underlying Erlang VM     | name: couchdb, setcookie: monster
-| `persistentVolume.enabled`      | Boolean determining whether to attach a PV to each node | false
-| `persistentVolume.size`         | If enabled, the size of the persistent volume to attach                          | 10Gi
-| `enableSearch`                  | Adds a sidecar for Lucene-powered text search         | false                                  |
+| Parameter                  | Description                                             | Default                            |
+| -------------------------- | ------------------------------------------------------- | ---------------------------------- |
+| `clusterSize`              | The initial number of nodes in the CouchDB cluster      | 3                                  |
+| `couchdbConfig`            | Map allowing override elements of server .ini config    | _See below_                        |
+| `allowAdminParty`          | If enabled, start cluster without admin account         | false (requires creating a Secret) |
+| `createAdminSecret`        | If enabled, create an admin account and cookie secret   | true                               |
+| `schedulerName`            | Name of the k8s scheduler (other than default)          | `nil`                              |
+| `erlangFlags`              | Map of flags supplied to the underlying Erlang VM       | name: couchdb, setcookie: monster  |
+| `persistentVolume.enabled` | Boolean determining whether to attach a PV to each node | false                              |
+| `persistentVolume.size`    | If enabled, the size of the persistent volume to attach | 10Gi                               |
+| `enableSearch`             | Adds a sidecar for Lucene-powered text search           | false                              |
 
 You can set the values of the `couchdbConfig` map according to the
 [official configuration][4]. The following shows the map's default values and
 required options to set:
 
-|           Parameter             |             Description                                            |                Default                 |
-|---------------------------------|--------------------------------------------------------------------|----------------------------------------|
-| `couchdb.uuid`                  | UUID for this CouchDB server instance ([Required in a cluster][5]) |                                        |
-| `chttpd.bind_address`           | listens on all interfaces when set to any                          | any                                    |
-| `chttpd.require_valid_user`     | disables all the anonymous requests to the port 5984 when true     | false                                  |
+| Parameter                   | Description                                                        | Default |
+| --------------------------- | ------------------------------------------------------------------ | ------- |
+| `couchdb.uuid`              | UUID for this CouchDB server instance ([Required in a cluster][5]) |         |
+| `chttpd.bind_address`       | listens on all interfaces when set to any                          | any     |
+| `chttpd.require_valid_user` | disables all the anonymous requests to the port 5984 when true     | false   |
 
 A variety of other parameters are also configurable. See the comments in the
 `values.yaml` file for further details:
 
-|           Parameter                  |                Default                 |
-|--------------------------------------|----------------------------------------|
-| `adminUsername`                      | admin                                  |
-| `adminPassword`                      | auto-generated                         |
-| `adminHash`                          |                                        |
-| `cookieAuthSecret`                   | auto-generated                         |
-| `image.repository`                   | couchdb                                |
-| `image.tag`                          | 2.3.1                                  |
-| `image.pullPolicy`                   | IfNotPresent                           |
-| `searchImage.repository`             | kocolosk/couchdb-search                |
-| `searchImage.tag`                    | 0.1.0                                  |
-| `searchImage.pullPolicy`             | IfNotPresent                           |
-| `initImage.repository`               | busybox                                |
-| `initImage.tag`                      | latest                                 |
-| `initImage.pullPolicy`               | Always                                 |
-| `ingress.enabled`                    | false                                  |
-| `ingress.hosts`                      | chart-example.local                    |
-| `ingress.annotations`                |                                        |
-| `ingress.path`                       | /                                      |
-| `ingress.tls`                        |                                        |
-| `persistentVolume.accessModes`       | ReadWriteOnce                          |
-| `persistentVolume.storageClass`      | Default for the Kube cluster           |
-| `podManagementPolicy`                | Parallel                               |
-| `affinity`                           |                                        |
-| `annotations`                        |                                        |
-| `tolerations`                        |                                        |
-| `resources`                          |                                        |
-| `service.annotations`                |                                        |
-| `service.enabled`                    | true                                   |
-| `service.type`                       | ClusterIP                              |
-| `service.externalPort`               | 5984                                   |
-| `dns.clusterDomainSuffix`            | cluster.local                          |
-| `networkPolicy.enabled`              | true                                   |
-| `serviceAccount.enabled`             | true                                   |
-| `serviceAccount.create`              | true                                   |
-| `serviceAccount.imagePullSecrets`    |                                        |
-| `sidecars`                           | {}                                     |
-| `livenessProbe.enabled`              | true                                   |
-| `livenessProbe.failureThreshold`     | 3                                      |
-| `livenessProbe.initialDelaySeconds`  | 0                                      |
-| `livenessProbe.periodSeconds`        | 10                                     |
-| `livenessProbe.successThreshold`     | 1                                      |
-| `livenessProbe.timeoutSeconds`       | 1                                      |
-| `readinessProbe.enabled`             | true                                   |
-| `readinessProbe.failureThreshold`    | 3                                      |
-| `readinessProbe.initialDelaySeconds` | 0                                      |
-| `readinessProbe.periodSeconds`       | 10                                     |
-| `readinessProbe.successThreshold`    | 1                                      |
-| `readinessProbe.timeoutSeconds`      | 1                                      |
+| Parameter                            | Default                      |
+| ------------------------------------ | ---------------------------- |
+| `adminUsername`                      | admin                        |
+| `adminPassword`                      | auto-generated               |
+| `adminHash`                          |                              |
+| `cookieAuthSecret`                   | auto-generated               |
+| `image.repository`                   | couchdb                      |
+| `image.tag`                          | 2.3.1                        |
+| `image.pullPolicy`                   | IfNotPresent                 |
+| `searchImage.repository`             | kocolosk/couchdb-search      |
+| `searchImage.tag`                    | 0.1.0                        |
+| `searchImage.pullPolicy`             | IfNotPresent                 |
+| `initImage.repository`               | busybox                      |
+| `initImage.tag`                      | latest                       |
+| `initImage.pullPolicy`               | Always                       |
+| `ingress.enabled`                    | false                        |
+| `ingress.hosts`                      | chart-example.local          |
+| `ingress.annotations`                |                              |
+| `ingress.path`                       | /                            |
+| `ingress.tls`                        |                              |
+| `persistentVolume.accessModes`       | ReadWriteOnce                |
+| `persistentVolume.storageClass`      | Default for the Kube cluster |
+| `podManagementPolicy`                | Parallel                     |
+| `affinity`                           |                              |
+| `annotations`                        |                              |
+| `tolerations`                        |                              |
+| `resources`                          |                              |
+| `service.annotations`                |                              |
+| `service.enabled`                    | true                         |
+| `service.type`                       | ClusterIP                    |
+| `service.externalPort`               | 5984                         |
+| `dns.clusterDomainSuffix`            | cluster.local                |
+| `networkPolicy.enabled`              | true                         |
+| `serviceAccount.enabled`             | true                         |
+| `serviceAccount.create`              | true                         |
+| `serviceAccount.imagePullSecrets`    |                              |
+| `serviceAccount.roles`               | []                           |
+| `sidecars`                           | {}                           |
+| `livenessProbe.enabled`              | true                         |
+| `livenessProbe.failureThreshold`     | 3                            |
+| `livenessProbe.initialDelaySeconds`  | 0                            |
+| `livenessProbe.periodSeconds`        | 10                           |
+| `livenessProbe.successThreshold`     | 1                            |
+| `livenessProbe.timeoutSeconds`       | 1                            |
+| `readinessProbe.enabled`             | true                         |
+| `readinessProbe.failureThreshold`    | 3                            |
+| `readinessProbe.initialDelaySeconds` | 0                            |
+| `readinessProbe.periodSeconds`       | 10                           |
+| `readinessProbe.successThreshold`    | 1                            |
+| `readinessProbe.timeoutSeconds`      | 1                            |
 
 ## Feedback, Issues, Contributing
 
