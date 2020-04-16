@@ -211,6 +211,7 @@ A variety of other parameters are also configurable. See the comments in the
 | `readinessProbe.periodSeconds`       | 10                           |
 | `readinessProbe.successThreshold`    | 1                            |
 | `readinessProbe.timeoutSeconds`      | 1                            |
+| `splitStorage.enabled`               | false                        |
 
 ## Feedback, Issues, Contributing
 
